@@ -1,0 +1,23 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: EventPublicationChannel
+		Node: Root
+		Action: Activate 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	   
+*/
+
+import ABSL;
+
+var channel;
+foreach(channel in this)
+{
+	if(channel.IsSet() && channel.ChannelStatus != ChannelStatusCode.CO_2_ACTIVE)
+		channel.ChannelStatus = ChannelStatusCode.CO_2_ACTIVE;
+}

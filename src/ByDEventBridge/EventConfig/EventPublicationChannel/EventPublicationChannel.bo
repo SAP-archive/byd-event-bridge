@@ -1,0 +1,37 @@
+﻿import AP.Common.GDT as apCommonGDT;
+import AP.PDI.bo;
+
+businessobject EventPublicationChannel {
+
+        // Root node must not be specified, it is created implicitly
+        //
+        // Add elements here. 
+        // 
+        // To declare an element as alternative key, use the [AlternativeKey] annotation.
+        // Please note:
+        // - An alternative key of type UUID exists implicitly for each node, enabling the node
+        //   to be used as an association target.
+        // - The QueryByElements query is created automatically for each node.
+        // - Code completion is available with CTRL + SPACE.
+		[Label("Channel ID")][AlternativeKey] element ID : ID;
+		[Label("Channel Name")] element ChannelName : LANGUAGEINDEPENDENT_MEDIUM_Name;
+		[Label("Channel Type")] element ChannelType : EventPublicationChannelTypeCod;
+		[Label("Status")] element ChannelStatus : ChannelStatusCode = ChannelStatusCode.CO_1_IN_PREPARE;
+		[Label("Authentication Method")] element AuthenticationMethod : AuthenticationMethodCode;
+		[Label("User")] element User : LANGUAGEINDEPENDENT_ENCRYPTED_LONG_Name;
+		[Label("Password")] element Password : LANGUAGEINDEPENDENT_ENCRYPTED_MEDIUM_Description;
+		[Label("Auth. Service Name")][Tooltip("Service Name for invoking Authentication of publication Channel via HTTP")] element AuthServiceName : LANGUAGEINDEPENDENT_MEDIUM_Name;
+		[Label("Comm. Scenario for Channel Auth.")][Tooltip("Communication Scenario for the Authenticaiton of outbound Publication Channel")] element ChannelAuthCS : LANGUAGEINDEPENDENT_MEDIUM_Name;
+		[Label("Channel Auth. Endpoint")][Transient][Tooltip("For information only, the URL of Channel Authentication Endpoint is defined in its associated Communicatition Scenario")] element ChannelAuthUrl : MEDIUM_WebURI;
+		[Transient] element Token : String;
+		[Label("Access Service Name")][Tooltip("Service Name for accessing to publication Channel via HTTP")] element AccessServiceName : LANGUAGEINDEPENDENT_MEDIUM_Name;
+		[Label("Comm. Scenario for Channel Access")][Tooltip("Communication Scenario for the outbound access to Publication Channel")] element ChannelAccessCS : LANGUAGEINDEPENDENT_MEDIUM_Name;
+		[Label("Channel Access Endpoint")][Transient][Tooltip("For information only, the URL of Channel Access Endpoint is defined in its associated Communicatition Scenario")] element ChannelAccessUrl : MEDIUM_WebURI;
+		[Label("FIFO Sequential Process")] element FIFO : Indicator = true;
+
+		action Activate;
+		action Deactivate;
+		action Discard;
+		action Authenticate;
+		action PopulateData;
+}

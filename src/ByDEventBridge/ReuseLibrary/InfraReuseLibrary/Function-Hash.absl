@@ -1,0 +1,49 @@
+﻿import ABSL;
+import AP.PDI.bo;
+import AP.PDI.Utilities;
+import AP.Common.GDT;
+
+//Wrapper of Hash function from https://api.hashify.net
+//Please refer to https://hashify.net for supported has hash function, digest format etc.
+var result : DataType::String;
+var urlParams : collectionof NameAndValue;
+var urlParamEntry : NameAndValue;
+
+var headerParams : collectionof NameAndValue;
+var headerEntry : NameAndValue;
+	
+var contentType = "text/plain";
+var resource = "/hash/".Concatenate(hashAlgorithm).Concatenate("/").Concatenate(digestFormat);
+
+var ws_result = WebServiceUtilities.ExecuteRESTServiceWithoutEncoding(commScenario, extServiceName, "POST", resource, urlParams, headerParams, contentType, stringToHash);
+var httpRespCode = ws_result.Code.Trim();
+Trace.Info("Publicaiton-WebServiceUtilities.ExecuteRESTServiceWithoutEncoding() response code", httpRespCode);
+
+if (httpRespCode.Length() > 0)
+{
+	//hashify success
+	if (httpRespCode == "200")
+	{
+		result = ws_result.Content;
+		//Parse the json result
+		var keys : collectionof LANGUAGEINDEPENDENT_Text;
+		var key = "Digest";
+		keys.Add(key);
+		
+		var jsonResult : JsonResult;
+		jsonResult = Json.ParseKeyValues(keys, ws_result.Content);
+		var keyValue = jsonResult.KeyValue;
+		foreach(var res in keyValue)
+		{
+			result = res.Value;
+		}
+		Trace.Info("Hashified with api.hashify.net successfully", result);
+	}
+	else 
+	{
+		Trace.Error("Failure occurred in invoking api.hashify.net", ws_result.Content);
+		result = "";
+	}
+}
+
+return result;

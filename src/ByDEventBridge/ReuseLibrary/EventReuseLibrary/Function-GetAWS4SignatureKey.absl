@@ -1,0 +1,48 @@
+﻿import ABSL;
+import AP.PDI.bo;
+import AP.Common.GDT;
+import AP.PlatinumEngineering;
+
+/************* Begining of Important note *************
+EventReuseLibrary.GetAWS4SignatureKey() doesn't return the same result as python sample,
+Resulting in 403 error about the mismatched hash string.
+There seems no equivalent function in ABSL to hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+where key is binary object(bytes), and in ABSL, WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode
+requires key as string.
+
+This function GetAWS4SignatureKey is to translate the following python functions to ABSL.
+
+Python Post sample:
+https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html#sig-v4-examples-post
+
+def sign(key, msg):
+    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
+def getSignatureKey(key, date_stamp, regionName, serviceName):
+    kDate = sign(('AWS4' + key).encode('utf-8'), date_stamp)
+    kRegion = sign(kDate, regionName)
+    kService = sign(kRegion, serviceName)
+    kSigning = sign(kService, 'aws4_request')
+    return kSigning
+
+**************** End of Important note ***************/
+var result : DataType::String;
+var algo = algorithm;
+if(algo.IsInitial())
+	algo = "SHA256";
+
+//var key = InfraReuseLibrary.EncodeUrl("AWS4".Concatenate(secretKey));
+var key = TextAnalysis.ConvertToUTF8("AWS4".Concatenate(secretKey));
+//var key = "AWS4".Concatenate(secretKey);
+//var kDate : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, key, InfraReuseLibrary.EncodeUrl(inputDateStr));
+//var kRegion : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kDate, InfraReuseLibrary.EncodeUrl(awsRegionName));
+//var kService : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kRegion, InfraReuseLibrary.EncodeUrl(awsRegionName));
+//var kSignature : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kService, InfraReuseLibrary.EncodeUrl("aws4_request"));
+var kDate : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, key, TextAnalysis.ConvertToUTF8(inputDateStr));
+var kRegion : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kDate, TextAnalysis.ConvertToUTF8(awsRegionName));
+var kService : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kRegion, TextAnalysis.ConvertToUTF8(awsRegionName));
+var kSignature : LANGUAGEINDEPENDENT_EXTENDED_Text = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, algo, kService, TextAnalysis.ConvertToUTF8("aws4_request"));
+
+result = kSignature;
+
+return result;

@@ -1,0 +1,20 @@
+﻿import ABSL;
+import AP.PC.IdentityManagement.Global;
+
+var result : elementsof BusinessObject::BusinessObjectEvent;
+
+result.EventID = NumberRange.DrawNumber("EVENT").ToString();
+result.EventSourceTenantHost = Context.GetSystemURL();
+result.EventType = evtType;
+result.EventPublisher = evtPublisher;
+result.ObjectType = objType;
+result.ObjectUUID = objUUID;
+result.ObjectID = objID;
+result.SourceNodeName = nodeName;
+result.SourceNodeID = nodeId;
+result.EventStatus = EventStatusCode.CO_00_NEW;
+
+result.EventSysAdminData.CreationDateTime = Context.GetCurrentGlobalDateTime();
+result.EventSysAdminData.CreationUserAccountID.content = InfraReuseLibrary.GetCurrentUserAccountID().content;
+
+return result;

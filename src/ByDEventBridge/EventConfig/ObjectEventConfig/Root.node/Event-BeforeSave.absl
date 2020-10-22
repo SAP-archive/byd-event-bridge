@@ -1,0 +1,35 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: ObjectEventConfig
+		Node: Root
+		Event: BeforeSave 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	  - The solution uses this script when:
+		- the instance of the business object is being saved.
+		- the instance of the business object is created from other sources like web services, preview screen, and so on.
+*/
+
+import ABSL;
+
+var currentTime = Context.GetCurrentGlobalDateTime();
+var currentUserId = InfraReuseLibrary.GetCurrentUserAccountID();
+
+foreach (var objEvtConfig in this)
+{
+	if (objEvtConfig.ConfigAdminData.CreationUserAccountID.content.IsInitial())
+	{
+		objEvtConfig.ConfigAdminData.CreationDateTime = currentTime;
+		objEvtConfig.ConfigAdminData.CreationUserAccountID = currentUserId;
+	}
+	else
+	{
+		objEvtConfig.ConfigAdminData.LastChangeDateTime = currentTime;
+		objEvtConfig.ConfigAdminData.LastChangeUserAccountID = currentUserId;	
+	}
+}

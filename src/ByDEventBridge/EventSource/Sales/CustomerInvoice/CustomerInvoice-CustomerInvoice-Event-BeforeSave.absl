@@ -1,0 +1,68 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: CustomerInvoice
+		Node: CustomerInvoice
+		Event: BeforeSave 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	  - The solution uses this script when:
+		- the instance of the business object is being saved.
+		- the instance of the business object is created from other sources like web services, preview screen, and so on.
+*/
+
+import ABSL;
+import AP.Common.GDT;
+
+//Mass enabled for best performance - Create an event for each instance of CustomerInvoice
+var eventList : collectionof BusinessObjectEvent;
+
+var invoice : CustomerInvoice;
+foreach(invoice in this)
+{
+	//Prepare the event data structure
+	var eventRoot : elementsof BusinessObjectEvent;
+
+	//determine if it is Add or Update event.
+	var eventType = EventTypeCode.CO_01_ADD;
+	//if(CustomerInvoice.Retrieve(invoice.UUID).IsSet())
+	//If the invoice ID already exist,then it is an Update.
+	if(!invoice.ID.IsInitial())
+		eventType = EventTypeCode.CO_02_UPDATE;
+
+	//Determine Release or Approve or Reject event by comparing the ReleaseStatusCode and ApprovalStatusCode 
+	//of invoice instance in cache against the invoice instance loaded from DB
+	var invoiceFromDB = CustomerInvoice.Retrieve(invoice.UUID);
+	if(!invoice.ID.IsInitial() && invoiceFromDB.IsSet() && !invoiceFromDB.ID.IsInitial())
+	{
+		//Important Note: This block of code is not working as expected. As a result,
+		//it is not possible to elaborate the event type Release, Approve and Reject from Update. 
+
+		//ReleaseStatusCode: 3 - Released 
+		//From non-released to released, then it is an Release event
+		if(invoiceFromDB.Status.ReleaseStatusCode != "3" && invoice.Status.ReleaseStatusCode == "3")
+			eventType = EventTypeCode.CO_05_RELEASE;
+
+		//ApprovalStatusCode: 4 - Approved 
+		//From non-approved to Approved, then it is an Approve event 
+		if(invoiceFromDB.Status.ApprovalStatusCode != "4" && invoice.Status.ApprovalStatusCode == "4")
+			eventType = EventTypeCode.CO_06_APPROVE;
+
+		//ApprovalStatusCode: 5 - Rejected 
+		//From non-rejected to rejected, then it is an Reject event
+		if(invoiceFromDB.Status.ApprovalStatusCode != "5" && invoice.Status.ApprovalStatusCode == "5")
+			eventType = EventTypeCode.CO_07_REJECT;
+	}
+
+	eventRoot = EventReuseLibrary.CreateEvent(eventType, "004", invoice.UUID, invoice.ID.content, "Root", invoice.NodeID, EventPublisherCode.CO_00_INTERNAL);
+	
+	//Create an instance of event
+	var instEvent;
+	instEvent = BusinessObjectEvent.Create(eventRoot);
+
+	eventList.Add(instEvent);
+}

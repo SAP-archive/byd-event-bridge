@@ -1,0 +1,76 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: EventPublicationChannel
+		Node: Root
+		Action: Authenticate 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	   
+*/
+
+import ABSL;
+import AP.PDI.Utilities;
+import AP.Common.GDT;
+
+var channel;
+foreach (channel in this)
+{
+	if (channel.IsSet())
+	{
+		//01-Handling the OAuth 2.0 authentication, which has different auth url from access url.(used by SAP Enterprise Messaging)
+		if (channel.AuthenticationMethod == AuthenticationMethodCode.CO_02_OAUTH_2)
+		{
+			var urlParams : collectionof NameAndValue;
+			var urlParamEntry : NameAndValue;
+			urlParamEntry.Name = "grant_type";
+			urlParamEntry.Value = "client_credentials";
+			urlParams.Add(urlParamEntry);
+
+			urlParamEntry.Name = "response_type";
+			urlParamEntry.Value = "token";
+			urlParams.Add(urlParamEntry);
+
+			//Encode user:password with BASE64
+			var headerParams : collectionof NameAndValue;
+			var headerEntry : NameAndValue;
+			var userPwdPair : NameAndValue;
+			userPwdPair.Name = channel.User;
+			userPwdPair.Value = channel.Password;
+			headerEntry = EventReuseLibrary.GetBasicAuthHeader(userPwdPair);
+			//headerEntry.Name = "Authorization";
+			//var userPwd = channel.User.Concatenate(":").Concatenate(channel.Password);
+			//headerEntry.Value = "Basic ".Concatenate(Binary.ToBase64String(Binary.ParseFromString(userPwd)));
+			headerParams.Add(headerEntry);
+
+			//Fixed ContentType and empty body required by SAP Enterprise Messaging's OA2. You may make it dynamic input from UI instead.
+			var contentType = "application/x-www-form-urlencoded";
+			var body = "";
+
+			var ws_result = WebServiceUtilities.ExecuteRESTService(channel.ChannelAuthCS, channel.AuthServiceName, "POST", "", urlParams, headerParams, contentType, body);
+			Trace.Info("Authenticaiton-WebServiceUtilities.ExecuteRESTService() response code", ws_result.Code);
+
+			//Invalid result, then continue to next;
+			if(ws_result.Code.Trim() != "200" || !Json.IsValidJson(ws_result.Content))
+				continue;
+
+			//Parse the JSON response to get the access token.
+			var keys : collectionof LANGUAGEINDEPENDENT_Text;
+			var key;
+			key = "access_token";
+			keys.Add(key);
+			
+			var jsonResult : JsonResult;
+			jsonResult = Json.ParseKeyValues(keys, ws_result.Content);
+			var keyValues = jsonResult.KeyValue;
+			foreach (var res in keyValues)
+			{
+				channel.Token = "Bearer ".Concatenate(res.Value);
+			}
+		}
+	}
+}

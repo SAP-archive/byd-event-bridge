@@ -1,0 +1,11 @@
+﻿import ABSL;
+import AP.Common.GDT;
+import AP.PC.IdentityManagement.Global;
+
+var result : DataType::UserAccountID;
+var identity = Identity.Retrieve(Context.GetCurrentIdentityUUID());
+if(identity.IsSet())
+{
+	result.content = identity.ID.content;
+}
+return result;

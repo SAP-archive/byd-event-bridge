@@ -1,0 +1,8 @@
+﻿import ABSL;
+
+var result : DataType::NameAndValue;
+result.Name = "Authorization";
+var userPwdStr = userPwdPair.Name.Concatenate(":").Concatenate(userPwdPair.Value);
+result.Value = "Basic ".Concatenate(Binary.ToBase64String(Binary.ParseFromString(userPwdStr)));
+
+return result;

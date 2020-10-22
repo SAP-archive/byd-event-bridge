@@ -1,0 +1,52 @@
+import AP.Common.GDT as apCommonGDT;
+import AP.PDI.bo;
+
+businessobject BusinessObjectEvent {
+
+        // Root node must not be specified, it is created implicitly
+        //
+        // Add elements here. 
+        // 
+        // To declare an element as alternative key, use the [AlternativeKey] annotation.
+        // Please note:
+        // - An alternative key of type UUID exists implicitly for each node, enabling the node
+        //   to be used as an association target.
+        // - The QueryByElements query is created automatically for each node.
+        // - Code completion is available with CTRL + SPACE.
+
+		[Label("Event ID")][AlternativeKey] element EventID : ID;
+		[Label("Source Tenant Host")] element EventSourceTenantHost : MEDIUM_WebURI;
+		[Label("Event Type")] element EventType : EventTypeCode = EventTypeCode.CO_01_ADD;
+		[Label("Object Type")] element ObjectType : BusinessObjectTypeCode;
+		[Label("Object UUID")] element ObjectUUID : UUID;
+		[Label("Object ID")] element ObjectID : ID;
+		[Label("Source Node Name")] element SourceNodeName : LANGUAGEINDEPENDENT_LONG_Name;
+		[Label("Source Node ID")] element SourceNodeID : LANGUAGEINDEPENDENT_LONG_Name;
+		[Label("Event Status")] element EventStatus : EventStatusCode = EventStatusCode.CO_00_NEW;
+		//Internal - Push Event Publisher by internal ByDEventBridge 
+		//External - Pull by Ralph's event publisher (not in used)
+		[Label("Event Publisher")] element EventPublisher : EventPublisherCode = EventPublisherCode.CO_00_INTERNAL;
+		[Label("Realtime Publication")][Tooltip("Indicating whether the Event is published immediately upon creation, otherwise by periodical mass run job.")] element RealtimePublication : Indicator = false;
+		element EventSysAdminData : USERACCOUNTBASED_SystemAdministrativeData;
+		[Transient] element JsonStr : String;
+		association ToObjectEventConfig [0,1] to ObjectEventConfig;
+
+		action ToJSON;
+		action Publish;
+		action Delete;
+
+		node Publication [0,n] {
+			//EventPublisherChannelCode
+			//00 - Generic HTTP Call
+			//01 - SAP Enterprise Messaging
+			//02 - SAP CPI
+			//03 - Azure Queue
+			//04 - AWS SQS
+			//05 - AWS SNS 
+			[Label("Event Publication Channel")] element PublicationChannelID : ID;
+			[Label("Event Publication Status")] element PublicationStatus : EventPublicationStatusCode = EventPublicationStatusCode.CO_00_NEW;
+			[Label("Published On")] element PublicationDateTime : GLOBAL_DateTime;
+			action Publish;
+		}
+		 
+}

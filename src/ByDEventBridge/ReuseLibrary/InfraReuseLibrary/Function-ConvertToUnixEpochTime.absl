@@ -1,0 +1,25 @@
+﻿import ABSL;
+import AP.Common.GDT;
+
+var result : DataType::NumberValue;
+var epochStart = "19700101000000";
+var epochStartDatetime = GlobalDateTime.ParseFromString(epochStart);
+var seconds = Numeric.ParseFromString(inputDateTime.GetSecond());
+result = inputDateTime.SubtractDuration(ABSL:Duration.Create(0,0,0,0,0,seconds)).Delta(epochStartDatetime).ConvertToMinutes() * 60;
+result = result + seconds;
+//The calculated unix epoch time in ABSL is always larger than the real value with a difference of 4860 seconds
+//Yet to find out the root cause. However, it has not impact here.
+result = result - 4860;
+
+//var epochStartDate =  epochStartDatetime.ConvertToDate(); // If you need just the date without time
+//var inputDate= inputDateTime.GetDate(); //seems not return the right date as UTC.
+
+//result = inputDate.Delta(epochStartDate).ConvertToDays() * 86400;
+//result = result + Numeric.ParseFromString(inputDateTime.GetHour()) * 3600;
+//result = result + Numeric.ParseFromString(inputDateTime.GetMinute()) * 60;
+//result = result + Numeric.ParseFromString(inputDateTime.GetSecond());
+
+Trace.Info("Input Date Time", inputDateTime.ToString());
+Trace.Info("Unix Epoch Time", result.ToString());
+
+return result;

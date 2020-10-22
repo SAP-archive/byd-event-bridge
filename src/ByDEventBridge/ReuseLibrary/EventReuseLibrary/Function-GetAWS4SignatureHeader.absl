@@ -1,0 +1,127 @@
+﻿import ABSL;
+import AP.Common.GDT;
+import AP.PlatinumEngineering;
+
+var result : DataType::NameAndValue;
+
+//************* TASK 1: CREATE A CANONICAL REQUEST *************
+var targetUri = WebServiceUtilities.GetURLFromCommunicationService(commScenario, extwsServiceName);
+var host = targetUri.Host;
+
+//Step 1 is to define the verb (GET, POST, etc.). Derived from input parameter method
+
+//Step 2: Create the canonical uri
+var canonicalUri = targetUri.Path;
+
+//Step 3: Create the canonical query string
+//derived from input parameter queryStr
+
+//Step 4: Create the canonical headers. Header names must be trimmed
+//and lowercase, and sorted in code point order from low to high.
+//Note that there is a trailing \n.
+var canonicalHeaders = "";
+if (!contentType.IsInitial() && contentType.Length() > 0)
+{
+	canonicalHeaders = "content-type:".Concatenate(contentType).Concatenate("\n");
+}
+
+canonicalHeaders = canonicalHeaders.Concatenate("host:").Concatenate(host);
+canonicalHeaders = canonicalHeaders.Concatenate("\nx-amz-date:").Concatenate(amzDateTimeStr).Concatenate("\n"); 
+//No x-amz-target header required by SQS. 
+//Reference: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/CommonParameters.html
+
+//Step 5: Create the list of signed headers. This lists the headers
+//in the canonical_headers list, delimited with ";" and in alpha order.
+//Note: The request can include any headers; canonical_headers and
+//signed_headers include those that you want to be included in the
+//hash of the request. "Host" and "x-amz-date" are always required.
+var signedHeaders = "host;x-amz-date";
+
+//add content-type to signedHeaders if there is a message body in payload instead of queryStr
+if (!body.IsInitial() && body.Length() > 0)
+{
+	signedHeaders = "content-type;".Concatenate(signedHeaders);
+}
+
+//Step 6: Create payload hash
+//For SQS.SendMessage action, the MessageBody must be as part of queryStr
+var hashAlgorithm = "SHA256";
+if (awsAlgorithm.IsInitial() || !awsAlgorithm.Contains("SHA256"))
+	hashAlgorithm = "SHA512";
+
+//External Web Service name and communication scenario, which is defined in ReuseLibrary/Hashify
+var hashifyCommScenario = "HashifyAPI_CS";
+var hashifyAPIService = "HashifyAPI";
+var digestFormat = "hex";
+
+//Step 7: Combine elements to create canonical request
+var canonicalRequest = method.Concatenate("\n");
+canonicalRequest = canonicalRequest.Concatenate(canonicalUri).Concatenate("\n");
+canonicalRequest = canonicalRequest.Concatenate(queryStr).Concatenate("\n");
+canonicalRequest = canonicalRequest.Concatenate(canonicalHeaders).Concatenate("\n");
+canonicalRequest = canonicalRequest.Concatenate(signedHeaders);
+
+//No hash for payload if MessageBody exist in queryStr
+var bodyHash;
+
+if (body.Length() == 0 && hashAlgorithm == "SHA256")
+{
+	//hardcoded the hash value for emtpy string to reduce the response time for it is a fixed value with under hash algorithm SHA256,
+	//and it is a bit slow for the hash function to invoke external hashify api
+	bodyHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+}
+else	
+	bodyHash = InfraReuseLibrary.Hash(hashifyCommScenario, hashifyAPIService, hashAlgorithm, digestFormat, InfraReuseLibrary.EncodeUrl(body));
+
+canonicalRequest = canonicalRequest.Concatenate("\n").Concatenate(bodyHash);
+
+Trace.Info("canonicalRequest before encoding and hash", canonicalRequest);
+
+//************* TASK 2: CREATE THE STRING TO SIGN*************
+//Match the algorithm to the hashing hashAlgorithm you use, either SHA-1 or
+//SHA-256 (recommended)
+//awsAlgorithm = "AWS4-HMAC-SHA256"
+var credentialScope = inputDateStr.Concatenate("/");
+credentialScope = credentialScope.Concatenate(awsRegion).Concatenate("/");
+credentialScope = credentialScope.Concatenate(awsService).Concatenate("/");
+credentialScope = credentialScope.Concatenate("aws4_request");
+
+var stringToSign = awsAlgorithm.Concatenate("\n");
+stringToSign = stringToSign.Concatenate(amzDateTimeStr).Concatenate("\n");
+stringToSign = stringToSign.Concatenate(credentialScope).Concatenate("\n");
+
+//var canonicalRequestHash : LANGUAGEINDEPENDENT_EXTENDED_Text=Hash.GetForString(hashAlgorithm, InfraReuseLibrary.EncodeUrl(canonicalRequest)).content;
+
+var canonicalRequestEncoded = InfraReuseLibrary.EncodeUrl(canonicalRequest);
+Trace.Info("canonicalRequest after url-encoded", canonicalRequestEncoded);
+
+//canonicalRequestEncoded = TextAnalysis.ConvertToUTF8(canonicalRequest);
+//Trace.Info("canonicalRequest after TextAnalysis.ConvertToUTF8", canonicalRequestEncoded);
+
+var canonicalRequestHash = InfraReuseLibrary.Hash(hashifyCommScenario, hashifyAPIService, hashAlgorithm, digestFormat, canonicalRequest);
+Trace.Info("canonicalRequestHash", canonicalRequestHash);
+
+stringToSign = stringToSign.Concatenate(canonicalRequestHash);
+
+//************* Begining of Important note *************
+//ABSL code works correctly until here which the stringToSign is calcuated correctly as python sample provided by AWS
+//However, EventReuseLibrary.GetAWS4SignatureKey() doesn't return the same result as python sample
+//Resulting in 403 error about the mismatched hash string
+//**************** End of Important note ***************
+
+//************* TASK 3: CALCULATE THE SIGNATURE *************
+//Create the signing key using the function defined above.
+var signingKey = EventReuseLibrary.GetAWS4SignatureKey(commScenario, secretKey, inputDateStr, awsRegion, awsService, hashAlgorithm);
+
+//Sign the string_to_sign using the signing_key
+//signature = hmac.new(signing_key, (string_to_sign).encode("utf-8"), hashlib.sha256).hexdigest()
+var signature : LANGUAGEINDEPENDENT_EXTENDED_Text=WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(commScenario, hashAlgorithm, signingKey, InfraReuseLibrary.EncodeUrl(stringToSign));
+
+//************* TASK 4: ADD SIGNING INFORMATION TO THE REQUEST *************
+// Put the signature information in a header named Authorization.
+result.Name = "Authorization";
+result.Value = awsAlgorithm.Concatenate(" Credential=").Concatenate(accessKey).Concatenate("/");
+result.Value = result.Value.Concatenate(credentialScope).Concatenate(", SignedHeaders=").Concatenate(signedHeaders);
+result.Value = result.Value.Concatenate(", Signature=").Concatenate(signature);
+
+return result;

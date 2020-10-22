@@ -1,0 +1,24 @@
+﻿import ABSL as absl;
+import AP.PDI.bo;
+import AP.PlatinumEngineering;
+
+var result : DataType::NameAndValue;
+
+var requestUrl = InfraReuseLibrary.ConvertUrlResultToUrl(WebServiceUtilities.GetURLFromCommunicationService(scenarioName,serviceName));
+var expiry = InfraReuseLibrary.ConvertToUnixEpochTime(Context.GetCurrentGlobalDateTime()) + expiration;
+var encodedUrl = URL.Encode(requestUrl);
+var stringToSign = encodedUrl.Concatenate("\n").Concatenate(expiry.ToString());
+var hmac = WebServiceUtilities.EncryptWithHashBasedMessageAuthenticationCode(scenarioName, "SHA256", keyPair.Value, stringToSign);
+var hashInBase64 = absl:Binary.ToBase64String(hmac);
+//Seems a bug in PlatiamnumEnginering's URL.Encode(), which doesn't encode "+"
+var encodedHash = URL.Encode(hashInBase64).Replace("+", "%2B");
+
+//how-to guide abotu Share Access Signature token
+//https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-sas#generate-a-shared-access-signature-token
+result.Name = "Authorization";
+result.Value = "SharedAccessSignature sr=".Concatenate(encodedUrl);
+result.Value = result.Value.Concatenate("&sig=").Concatenate(encodedHash);
+result.Value = result.Value.Concatenate("&se=").Concatenate(expiry.ToString()); 
+result.Value = result.Value.Concatenate("&skn=").Concatenate(keyPair.Name);
+
+return result;

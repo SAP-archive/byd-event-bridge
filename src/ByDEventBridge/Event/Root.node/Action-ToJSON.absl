@@ -1,0 +1,63 @@
+/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: BusinessObjectEvent
+		Node: Root
+		Action: ToJSON 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	   
+*/
+
+import ABSL;
+
+foreach(var event in this)
+{
+	var nameValuePairs : collectionof NameAndValue;
+	var pair : NameAndValue;
+	pair.Name = "EventID";
+	pair.Value = event.EventID.TrimLeft("0");
+	nameValuePairs.Add(pair);
+
+	pair.Name = "SourceTenantHost";
+	pair.Value = event.EventSourceTenantHost;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "EventType";
+	pair.Value = event.EventType;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "ObjectType";
+	pair.Value = event.ObjectType;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "ObjectID";
+	pair.Value = event.ObjectID;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "ObjectUUID";
+	pair.Value = event.ObjectUUID.content.ToString();
+	nameValuePairs.Add(pair);
+
+	pair.Name = "SourceNodeName";
+	pair.Value = event.SourceNodeName;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "SourceNodeID";
+	pair.Value = event.SourceNodeID;
+	nameValuePairs.Add(pair);
+
+	pair.Name = "CreationDate";
+	pair.Value = event.EventSysAdminData.CreationDateTime.ToString();
+	nameValuePairs.Add(pair);
+
+	pair.Name = "PublicationDate";
+	pair.Value = Context.GetCurrentGlobalDateTime().ToString();
+	nameValuePairs.Add(pair);
+	
+	event.JsonStr = InfraReuseLibrary.ConvertNameValuesToJsonStr(nameValuePairs);
+}

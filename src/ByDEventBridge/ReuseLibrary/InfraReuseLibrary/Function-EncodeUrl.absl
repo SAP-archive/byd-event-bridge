@@ -1,0 +1,9 @@
+﻿import ABSL;
+import AP.PDI.bo;
+import AP.PlatinumEngineering;
+
+//TextAnalysis.ConvertToUTF8("")
+var result : DataType::String;
+result = URL.Encode(strToEncode).Replace("+", "%2B").Replace(",", "%2C");
+
+return result;

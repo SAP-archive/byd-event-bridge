@@ -1,0 +1,66 @@
+/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: BusinessObjectEvent
+		Node: Root
+		Action: Publish 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	   
+*/
+
+import ABSL;
+
+var event : BusinessObjectEvent;
+foreach (event in this)
+{
+	var publicaiton = event.Publication;
+	var channel;
+	var success = true;
+	var publishedFlag = false;
+	var newStatusFlag = false;
+	var failureStatusFlag = false;
+
+	event.ToJSON();
+	foreach (channel in publicaiton)
+	{
+		channel.Publish();
+
+		if (channel.PublicationStatus != EventPublicationStatusCode.CO_02_PUBLISHED)
+		{
+			success = false;	
+		}
+
+		if (channel.PublicationStatus == EventPublicationStatusCode.CO_02_PUBLISHED)
+		{
+			//at least one channel publication successful
+			publishedFlag = true;	
+		}
+
+		if (channel.PublicationStatus == EventPublicationStatusCode.CO_03_FAILED)
+		{
+			//at least one channel publication failed
+			failureStatusFlag = true;	
+		}
+
+		if (channel.PublicationStatus == EventPublicationStatusCode.CO_00_NEW)
+		{
+			//at least one channel publication is cancelled due to missing configuration in Channel
+			newStatusFlag = true;	
+		}
+	}
+
+	//All publication success, mark the event status as COMPLETED
+	if (success)
+		event.EventStatus = EventStatusCode.CO_02_COMPLETED;
+	else if(publishedFlag && (failureStatusFlag || newStatusFlag))
+		//at least one published, mark it as Partially Complted
+		event.EventStatus = EventStatusCode.CO_04_COMP_PARTIALY;
+	else if(failureStatusFlag)
+		//At least one publication failure, and no published.
+		event.EventStatus = EventStatusCode.CO_03_COMP_FAIL;
+}

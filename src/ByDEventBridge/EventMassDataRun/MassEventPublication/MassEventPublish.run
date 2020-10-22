@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MassDataRunObject xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://sap.com/ByD/PDI/MassDataRunObjectDefinition">
+  <MdroEsrNameSpace xmlns="">http://refsystems.sap.com/YCNOWIADY_</MdroEsrNameSpace>
+  <MdroEsrName xmlns="">MassEventPublish</MdroEsrName>
+  <MdroPrxName xmlns="">YCNOWIADY_MASH7256E4111E01A57B</MdroPrxName>
+  <ParallelProcessing xmlns="">X</ParallelProcessing>
+  <ApplicationLogDetailLevelCode xmlns="">5</ApplicationLogDetailLevelCode>
+  <ApplicationLogRetentionTimeCode xmlns="">P7D</ApplicationLogRetentionTimeCode>
+  <AccessControlledBoList xmlns="">
+    <AccessControlledBo>
+      <ActionEntity>
+        <BoEsrNameSpace>http://refsystems.sap.com/YCNOWIADY_</BoEsrNameSpace>
+        <BoEsrName>BusinessObjectEvent</BoEsrName>
+        <BoPrxName>YCNOWIADY_BUNTE5823F6FACEAE55F</BoPrxName>
+        <BoEsrNodeName>Root</BoEsrNodeName>
+        <BoPrxNodeName>ROOT4F903855210031B0</BoPrxNodeName>
+        <BoEsrEntityName>Publish</BoEsrEntityName>
+        <BoPrxEntityName>PUBLISH77100CD50AE00293</BoPrxEntityName>
+      </ActionEntity>
+      <ActionPath>\TO_PARENT</ActionPath>
+      <QueryEntity>
+        <BoEsrNameSpace>http://refsystems.sap.com/YCNOWIADY_</BoEsrNameSpace>
+        <BoEsrName>BusinessObjectEvent</BoEsrName>
+        <BoPrxName>YCNOWIADY_BUNTE5823F6FACEAE55F</BoPrxName>
+        <BoEsrNodeName>EventQuery</BoEsrNodeName>
+        <BoPrxNodeName>EVENTQUERY74757D4A3615AB62</BoPrxNodeName>
+        <BoEsrEntityName>QueryByElements</BoEsrEntityName>
+        <BoPrxEntityName>QUERY_BY_ELEMENTS</BoPrxEntityName>
+      </QueryEntity>
+      <QueryParameterList>
+        <QueryParameter>
+          <QueryEsrParameterName>EventID</QueryEsrParameterName>
+          <QueryPrxParameterName>EVENTIROOTECC013C52C8D4A04</QueryPrxParameterName>
+          <QueryPrxParameterDataType>PDI_ABSL_IDENTIFIER</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByEventID</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_EVID12724ABB5DA6ED0E</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>EventType</QueryEsrParameterName>
+          <QueryPrxParameterName>EVENTTROOT7190EE911CD06693</QueryPrxParameterName>
+          <QueryPrxParameterDataType>YCNOWIADY_72AAB8F5D3E9D32D</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByEventType</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_EVPEAA8C3FEF8C90EA37</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>ObjectType</QueryEsrParameterName>
+          <QueryPrxParameterName>OBJECTROOT4903E5DB90BCF0E5</QueryPrxParameterName>
+          <QueryPrxParameterDataType>APC_V_BUSINESS_OBJECT_TYPE_C</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByObjectType</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_OBPEB2FB41508CF30422</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>ObjectID</QueryEsrParameterName>
+          <QueryPrxParameterName>OBJECTROOT771966158BF82007</QueryPrxParameterName>
+          <QueryPrxParameterDataType>PDI_ABSL_IDENTIFIER</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByObjectID</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_OBIDFFE8C204F8368398</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>SourceNodeName</QueryEsrParameterName>
+          <QueryPrxParameterName>SOURCEROOT04E31A730FACB945</QueryPrxParameterName>
+          <QueryPrxParameterDataType>APC_V_LANGUAGEINDEP_LONG_NAME</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectBySourceNodeName</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_SOME21BD306BE99B3A99</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>EventStatus</QueryEsrParameterName>
+          <QueryPrxParameterName>EVENTSROOT4B4C10A63ED472DD</QueryPrxParameterName>
+          <QueryPrxParameterDataType>YCNOWIADY_EF658D97B7481352</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByEventStatus</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_EVUS83573CFE3EEFB1FF</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>Publication_PublicationChannelID</QueryEsrParameterName>
+          <QueryPrxParameterName>PUBLICROOT5D96D73773F9F08F</QueryPrxParameterName>
+          <QueryPrxParameterDataType>PDI_ABSL_IDENTIFIER</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByPublication_PublicationChannelID</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_PUIDF2ECBB520F877660</MdroPrxNodeName>
+        </QueryParameter>
+        <QueryParameter>
+          <QueryEsrParameterName>Publication_PublicationStatus</QueryEsrParameterName>
+          <QueryPrxParameterName>PUBLICROOTBA12BE24425CBC66</QueryPrxParameterName>
+          <QueryPrxParameterDataType>YCNOWIADY_9EB163226CAD1358</QueryPrxParameterDataType>
+          <MdroEsrNodeName>SelectByPublication_PublicationStatus</MdroEsrNodeName>
+          <MdroPrxNodeName>SEL_BY_PUUS79216C02CFF48A71</MdroPrxNodeName>
+        </QueryParameter>
+      </QueryParameterList>
+    </AccessControlledBo>
+  </AccessControlledBoList>
+</MassDataRunObject>

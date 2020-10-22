@@ -1,0 +1,7 @@
+﻿import ABSL;
+import AP.PDI.bo;
+
+var result : DataType::String;
+result = urlResult.Protocol.Replace("<", "").Replace(">", "");
+result = result.Concatenate("://").Concatenate(urlResult.Host).Concatenate(urlResult.Path);
+return result;

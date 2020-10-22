@@ -1,0 +1,189 @@
+/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: BusinessObjectEvent
+		Node: Publication
+		Action: Publish 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	   
+*/
+
+import ABSL;
+
+var channel;
+foreach (channel in this)
+{
+	if(channel.PublicationStatus == EventPublicationStatusCode.CO_02_PUBLISHED)
+	{	
+		Trace.Info("Event already published via", channel.PublicationChannelID);
+		continue;
+	}
+
+	var evtPubChannel = EventPublicationChannel.Retrieve(channel.PublicationChannelID);
+	Trace.Info("Event ", channel.ToParent.EventID.TrimLeft("0"));
+	Trace.Info("Event ", channel.PublicationChannelID);
+	if (!evtPubChannel.IsSet())
+		continue;
+
+	if(evtPubChannel.ChannelAccessCS.IsInitial())
+	{	
+		Trace.Info("No access communication Scenario defined in the publication channel", channel.PublicationChannelID);
+		continue;
+	}
+
+	if(evtPubChannel.AccessServiceName.IsInitial())
+	{
+		Trace.Info("No access service name defined in the publication channel", channel.PublicationChannelID);
+		continue;
+	}
+
+	var urlParams : collectionof NameAndValue;
+	var urlParamEntry : NameAndValue;
+
+	var headerParams : collectionof NameAndValue;
+	var headerEntry : NameAndValue;
+	
+	var contentType = "application/json";
+	var body = channel.ToParent.JsonStr;
+	var resource = "";
+
+	var authMethod = evtPubChannel.AuthenticationMethod;
+	if (authMethod == AuthenticationMethodCode.CO_02_OAUTH_2)
+	{	
+		//special header required by SAP Enterprise Messaging
+		if (evtPubChannel.ChannelType == EventPublicationChannelTypeCod.CO_02_SAP_ENT_MSG)
+		{
+			headerEntry.Name = "x-qos";
+			headerEntry.Value = "0";
+			headerParams.Add(headerEntry);
+		}
+
+		//Prepare the Authentication header for OAuth 2.0 token "Bearer xxxx"
+		headerEntry.Name = "Authorization";
+		//If the Channel has been authenticated yet, then Authenticate it.
+		if (evtPubChannel.Token.IsInitial())
+			evtPubChannel.Authenticate();
+		headerEntry.Value = evtPubChannel.Token;
+		headerParams.Add(headerEntry);
+	}
+	else if (authMethod == AuthenticationMethodCode.CO_01_BASIC_AUTH)
+	{
+		//Prepare the Authentication header for basic authentication
+		var userPwdPair : NameAndValue;
+		userPwdPair.Name = evtPubChannel.User;
+		userPwdPair.Value = evtPubChannel.Password;
+		headerEntry = EventReuseLibrary.GetBasicAuthHeader(userPwdPair);
+		headerParams.Add(headerEntry);
+	}
+	else if (authMethod == AuthenticationMethodCode.CO_03_SAS)
+	{
+		//Prepare the Authentication header for Shared Access Signature authentication
+		var userPwdPair : NameAndValue;
+		//SAS key name
+		userPwdPair.Name = evtPubChannel.User;
+		//SAS key
+		userPwdPair.Value = evtPubChannel.Password;
+		//SAS expiry in 1 hour
+		headerEntry = EventReuseLibrary.GetSASAuthHeader(evtPubChannel.ChannelAccessCS, evtPubChannel.AccessServiceName, userPwdPair, 3600);
+		//hardcoded sas token for testing
+		headerParams.Add(headerEntry);
+		//evtPubChannel.Token = headerEntry.Value;
+	}
+	else if (authMethod == AuthenticationMethodCode.CO_04_AWS_SIGNATURE_V4)
+	{
+		//Important Note: PLEASE DON'T USE CO_04_AWS_SIGNATURE_V4.
+		//Not able to calculate the AWS Signature within ABSL due to missing hash function
+		//and imcompatible function of HMAC.
+
+		//Prepare the Authentication header for AWS Signature V4 authentication
+		contentType = "";
+		//AWS access key
+		var accessKey = evtPubChannel.User;
+		//AWS secret key
+		var secretKey = evtPubChannel.Password;
+		var awsAlgorithm = "AWS4-HMAC-SHA256";
+		var awsRegion = "us-east-1";
+		var awsService = "sqs";
+		var currentGlobalDate = Context.GetCurrentGlobalDateTime();
+		var amzDateTimeStr = currentGlobalDate.ToString().Replace("-", "").Replace(":", "");
+		var inputDateStr = amzDateTimeStr.Substring(0,8);
+		var method = "POST";
+		var udf8EncodedBody = InfraReuseLibrary.EncodeUrl(body);
+		body = "";
+		var queryStr = "Action=SendMessage&MessageBody=".Concatenate(udf8EncodedBody).Concatenate("&Version=2012-11-05");
+		//var queryStr = "";
+		//resource = "?".Concatenate(queryStr);
+
+		urlParamEntry.Name = "Action";
+		urlParamEntry.Value = "SendMessage";
+		urlParams.Add(urlParamEntry);
+
+		urlParamEntry.Name = "MessageBody";
+		urlParamEntry.Value = udf8EncodedBody;
+		urlParams.Add(urlParamEntry);
+
+		urlParamEntry.Name = "Version";
+		urlParamEntry.Value = "2012-11-05";
+		urlParams.Add(urlParamEntry);
+
+		headerEntry.Name = "X-Amz-Date";
+		headerEntry.Value = amzDateTimeStr;
+		headerParams.Add(headerEntry);
+
+		headerEntry = EventReuseLibrary.GetAWS4SignatureHeader(evtPubChannel.ChannelAccessCS, evtPubChannel.AccessServiceName, 
+		awsRegion, awsService, accessKey, secretKey, awsAlgorithm,
+		amzDateTimeStr, inputDateStr,
+		 method, contentType, queryStr, body);
+
+		headerParams.Add(headerEntry);
+	}
+	else if (authMethod == AuthenticationMethodCode.CO_05_API_KEY)
+	{
+		//used by AWS API Gateway to acces the ByDEventProxy API to send message to AWS SQS
+		//For the authencation AWS Signature V4 is not working in ABSL, we have to create a REST API 
+		//in AWS API Gateway, which invoke a lamda function to send the ByD Event message to the SQS with AWS SDK.
+
+		//Prepare the X-api-key header
+		var apiKeyName = evtPubChannel.User;
+		if(apiKeyName.IsInitial())
+			apiKeyName = "x-api-key";
+		
+		headerEntry.Name = apiKeyName;
+		headerEntry.Value = evtPubChannel.Password;
+		headerParams.Add(headerEntry);
+
+		//Since only the AWS API Gateway host url is configured in the external communication and communication arrangement
+		//therefore specify your resource path here to the ByDEventProxy API of your own.
+		resource = "/default/ByDEventProxy";
+	}
+
+	//Don't use WebServiceUtilities.ExecuteRESTService here which will encode the http request, and lead to error
+	//for example,SAS token: "...&sig=...", & will be encoded and result in malformed token received in Azure
+	//var ws_result = WebServiceUtilities.ExecuteRESTService(evtPubChannel.ChannelAccessCS, evtPubChannel.AccessServiceName, "POST", "", urlParams, headerParams, contentType, body);
+	var ws_result = WebServiceUtilities.ExecuteRESTServiceWithoutEncoding(evtPubChannel.ChannelAccessCS, evtPubChannel.AccessServiceName, "POST", resource, urlParams, headerParams, contentType, body);
+	var httpRespCode = ws_result.Code.Trim();
+	Trace.Info("Publicaiton-WebServiceUtilities.ExecuteRESTService() response code", httpRespCode);
+
+	if(httpRespCode.Length() > 0)
+	{
+		//Publication success, update the publicaiton status and date
+		if (httpRespCode == "200" || httpRespCode == "201" || httpRespCode == "204")
+		{
+			Trace.Info("Event Published via ", channel.PublicationChannelID);
+			channel.PublicationDateTime = Context.GetCurrentGlobalDateTime();
+			channel.PublicationStatus = EventPublicationStatusCode.CO_02_PUBLISHED;
+		}
+		else 
+		{
+			Trace.Error("Event Publication failure via ", channel.PublicationChannelID);
+			Trace.Error("Error", ws_result.Content);
+			channel.PublicationDateTime = Context.GetCurrentGlobalDateTime();
+			channel.PublicationStatus = EventPublicationStatusCode.CO_03_FAILED;
+		}
+	}
+}

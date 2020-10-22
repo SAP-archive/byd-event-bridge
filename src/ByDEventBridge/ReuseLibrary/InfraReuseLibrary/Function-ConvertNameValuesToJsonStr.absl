@@ -1,0 +1,21 @@
+﻿import ABSL;
+import AP.PDI.bo;
+
+var result : DataType::String;
+result = "{ ";
+
+var i = 0;
+var count = nameValuePairs.Count() - 1;
+foreach(var pair in nameValuePairs)
+{
+	result = result.Concatenate("\"").Concatenate(pair.Name).Concatenate("\":\"").Concatenate(pair.Value);
+	//special case: last pair, no comma at the end
+	if(i == count)
+		result = result.Concatenate("\" ");
+	else
+		result = result.Concatenate("\",");
+	i = i + 1;
+}
+
+result = result.Concatenate("}");
+return result;

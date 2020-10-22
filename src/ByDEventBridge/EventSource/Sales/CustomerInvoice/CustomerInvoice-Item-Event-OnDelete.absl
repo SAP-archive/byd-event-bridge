@@ -1,0 +1,28 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: CustomerInvoice
+		Node: Item
+		Event: OnDelete 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - The solution uses this script when the instance of the business object gets deleted and SAVE is triggered.
+		- The fields on the current node are always read-only.
+		- The fields from other nodes follow regular read/write behavior.
+*/
+
+import ABSL;
+import AP.Common.GDT;
+
+//Mass enabled for best performance - Create an event for each instance of CustomerInvoice
+var eventList : collectionof BusinessObjectEvent;
+
+//Prepare the event data structure
+var eventRoot : elementsof BusinessObjectEvent;
+eventRoot = EventReuseLibrary.CreateEvent(EventTypeCode.CO_03_DELETE, "004", this.ToParent.UUID, this.ToParent.ID.content, "Item", this.NodeID, EventPublisherCode.CO_00_INTERNAL);
+	
+//Create an instance of event
+var instEvent;
+instEvent = BusinessObjectEvent.Create(eventRoot);

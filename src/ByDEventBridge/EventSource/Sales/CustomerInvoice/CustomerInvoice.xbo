@@ -1,0 +1,9 @@
+﻿import AP.Common.GDT;
+import AP.CustomerInvoicing.Global;
+
+[Extension] businessobject AP.CustomerInvoicing.Global:CustomerInvoice {
+ 
+        // You must activate this business object before you can access the extension fields
+        // or messages in script files, forms, and screens.
+
+}

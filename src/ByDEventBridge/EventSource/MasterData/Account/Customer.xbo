@@ -1,0 +1,23 @@
+﻿import AP.Common.GDT;
+import AP.FO.BusinessPartner.Global;
+
+[Extension] businessobject AP.FO.BusinessPartner.Global:Customer {
+ 
+        // You must activate this business object before you can access the extension fields
+        // or messages in script files, forms, and screens.
+
+    
+   		node AddressInformation {
+   	    } 
+    
+   		node BankDetails {
+   	    } 
+    
+   		node Common {
+   	    } 
+    
+   		node CurrentEmployeeResponsible {
+   	    } 
+     
+  
+}

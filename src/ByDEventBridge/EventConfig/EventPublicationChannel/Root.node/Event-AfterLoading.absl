@@ -1,0 +1,46 @@
+﻿/*
+	Add your SAP Business ByDesign scripting language implementation for:
+		Business Object: EventPublicationChannel
+		Node: Root
+		Event: AfterLoading 
+		
+	Note: 
+	  - To access the elements of the business object node, 
+	    use path expressions, for example, this.<element name>. 
+	  - To use code completion, press CTRL+J. 
+	  - This script file is mass-enabled, i.e. the keyword "this" 
+	    refers to a collection of node instances.
+	  - The solution uses this script when:
+		- the instance of the business object is being loaded.
+		- all the fields of business object are read-only and cannot be changed.
+*/
+
+import ABSL;
+
+var channel;
+foreach (channel in this)
+{
+	if (channel.IsSet())
+	{
+		//Populate the Channel Access Url
+		if (!channel.AccessServiceName.IsInitial() && !channel.ChannelAccessCS.IsInitial())
+		{
+			var uriData = WebServiceUtilities.GetURLFromCommunicationService(channel.ChannelAccessCS, channel.AccessServiceName);
+			if (!uriData.IsInitial())
+			{
+				channel.ChannelAccessUrl = InfraReuseLibrary.ConvertUrlResultToUrl(uriData);
+			}
+		}
+
+		//Populate the Channel Auth Url
+		if (!channel.AuthServiceName.IsInitial() && !channel.ChannelAuthCS.IsInitial())
+		{
+			var uriData = WebServiceUtilities.GetURLFromCommunicationService(channel.ChannelAuthCS, channel.AuthServiceName);
+			if (!uriData.IsInitial())
+			{
+				channel.ChannelAuthUrl = InfraReuseLibrary.ConvertUrlResultToUrl(uriData);
+				//channel.AuthMethod = uriData.AuthenticationMode;
+			}
+		}
+	}
+}
