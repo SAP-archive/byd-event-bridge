@@ -17,17 +17,55 @@ The prototype ByDEventBridge is a customer-specific solution built with SAP Clou
 
 It is recommended to create a solution template including all reusable artifacts, such as BODL file, ABSL file and Reuse Library etc which are shared in this github, then you create customer specific solution by importing the solution template.
 
-### [Event](src/ByDEventBridge/Event)
+### [Event](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/Event)
 #### BusinessObjectEvent
+![BusinessObjectEvent](resources/BusinessObjectEvent.png)
 
-### [Event Configuration](src/ByDEventBridge/EventConfig)
-#### [EventPublicationChannel](src/ByDEventBridge/EventConfig/EventPublicationChannel)
-#### [ObjectEventConfig](src/ByDEventBridge/EventConfig/ObjectEventConfig)
+### [Event Configuration](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig)
+#### [EventPublicationChannel](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/EventPublicationChannel)
+![EventPublicationChannel](resources/EventPublicationChannel.png)
 
-### [Event Source](src/ByDEventBridge/EventConfig/EventSource)
+#### [ObjectEventConfig](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ObjectEventConfig)
+![ObjectEventConfig](resources/ObjectEventConfig.png)
+
+### [Event Source](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/EventSource)
+In this sample, [CustomerInvoice](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/EventSource/CustomerInvoice) and Account are included as event sources through Event-BeforeSafe() of Business Object Extension.<br>
+
+You can generate the business object event to  a standard business object or custom business object by adding the following code in the Event-BeforeSafe on the targe node of the source business object.
 
 ## Step 2: Setup your own Cloud Messaging Service
+### SAP Cloud Platform Enterprise Messaging
+Please refer to [this blog post](https://blogs.sap.com/2020/10/21/scp-enterprise-messaging-for-the-smbs/) about how to setup an instance and create a message queue. as a result, you have obtain the secret key of the instance, which includes the token endpoint, clientid, and clientsecret, and uri for the httprest protocol used for setting up EventPublicationChannel.
+<br><br>
+A sample snippet json of oa2(Oauth 2.0) for httprest protocl
+```javascript
+"oa2": {
+        "clientid": "sb-default-abcdefghijkl....",
+        "clientsecret": "abcdefg...",
+        "tokenendpoint": "https://<your_instance>.authentication.eu10.hana.ondemand.com/oauth/token",
+        "granttype": "client_credentials"
+      },
+"protocol": [
+        "httprest"
+      ],
+"broker": {
+        "type": "saprestmgw"
+      },
+"uri": "https://enterprise-messaging-pubsub.cfapps.eu10.hana.ondemand.com"
 
+```
+### SAP Cloud Platform Integration
+Please refer to [this blog post](https://blogs.sap.com/2020/09/30/sap-cloud-platform-integration-for-sap-business-bydesign-webinar/) about how to setup an instance and create an integration flow with https adapter.
+
+### Azure Service Bus
+Please refer to [Azure Service Bus document](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal) about how to create and setup an Azure Service Bus namespace and a queue.
+
+### AWS SQS
+Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
+
+Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/ReuseLibrary/EventReuseLibrary/Function-GetAWS4SignatureKey.absl), AWS Signature V4 authentication to SQS is too complicated to implement with ABSL. Therefore, a custom rest API(namely ByDEventProxy-API) to send message to SQS with authentication as API Key through AWS API Gateway, which triggers a AWS Lambda function(namely ByDEventProxy[nodejs soure code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)) based on AWS SDK to send messages to SQS queue.
+<br>
+Please refer to [this AWS document](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-getting-started-with-rest-apis.html) about Creating a REST API with Lambda integrations in Amazon API Gateway 
 
 ## Step 3: Configure EventPublicationChannel representing your Cloud Messaging Service
 
@@ -50,3 +88,6 @@ Answer: Although, the sample prototype is cloud-messaging-service-agnostic, supp
 Answer: The granularity of messaging queue or topic could be per partner solution/object type/source tenant or any combination, giving the flexibility of partner solution development and operation for addressing the variety of business and security etc requirements. For instance:<br>
 * Case#1: Your company(SAP Partner) would like to develop and operate an eInvoicing solution as SaaS for multiple ByD customers, it is recommended to have one queue per client for the invoice object for the separation, and also due to the fact most cloud messaging service are charged by the number of messages, not by the number of queue.  For the eInvoicing app(event subscriber) which could be multi-tenant sharing among tenant, and you may need to design a mechanism when and how-to scale. If the eInvoicing app is implemented with serverless function, then it could be dynamically scaled up or down to accommodate the client requests with ease of mind. The pricing of your SaaS now could be easily calculated by the number of messages, and the process time of messages.<br><br>
 * Case#2: Your ByD client A requests an integration of warehouse activities in ByD with their in-house Warehouse Management System. Of course, the requirement could be implemented with Cloud Application Studio, OData/Web Service of SAP ByD or SAP Cloud Platform Integration etc, which it doesn't need event and additional messaging service. However, with increase of the complexity of integration and the number of systems to be integrated, an event-driven architecture becomes approperiate. In this case, you may request the client to purchase an appropriate cloud messaging service, and you will help to bridge the event in SAP ByD and integration scenario development.
+
+# License
+This ByDEventBridge prototype is released under the terms of the MIT license. See [LICENSE](LICENSE) for more information or see https://opensource.org/licenses/MIT.
