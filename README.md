@@ -1,5 +1,7 @@
 # Overview
-A prototype built with SAP Cloud App Studio enables an event pub/sub mechanism for SAP Business ByDesign by plugging into modern cloud messaging services for side-by-side solution/extension development via an event-driven and loosely-coupled approach
+A prototype built with SAP Cloud App Studio enables an event pub/sub mechanism for SAP Business ByDesign by plugging into modern cloud messaging services for side-by-side solution/extension development via an event-driven and loosely-coupled approach. <br>
+<br>
+Please refer to [this blog](https://blogs.sap.com/?p=1204783) about overview introduction.
 
 # Architecure and Design
 ## High level architecture
@@ -34,10 +36,17 @@ In this sample, [CustomerInvoice](https://github.com/B1SA/ByDEventBridge/tree/ma
 You can generate the business object event to  a standard business object or custom business object by adding the following code in the Event-BeforeSafe on the targe node of the source business object.
 
 ## Step 2: Setup your own Cloud Messaging Service
+The cloud messaging service here refers to as an extenral cloud-based messaging broker. The following are supported in the prototype ByDEventBridge. You may choose one above as the messaging broker for publication of ByD events.
+* SAP Cloud Platform Enterprise Messaging
+* SAP Cloud Platform Integration
+* Azure Service Bus
+* AWS SQS
+
 ### SAP Cloud Platform Enterprise Messaging
-Please refer to [this blog post](https://blogs.sap.com/2020/10/21/scp-enterprise-messaging-for-the-smbs/) about how to setup an instance and create a message queue. as a result, you have obtain the secret key of the instance, which includes the token endpoint, clientid, and clientsecret, and uri for the httprest protocol used for setting up EventPublicationChannel.
+Please refer to [this blog post](https://blogs.sap.com/2020/10/21/scp-enterprise-messaging-for-the-smbs/) about how to setup an instance SAP Cloud Platform Enterprise Messaging, and create a message queue for receiving ByD events. 
+<br>As a result, you should have obtained the secret key of the instance, which includes the tokenendpoint, clientid, and clientsecret, and uri for the httprest protocol used for setting up EventPublicationChannel in step 3.
 <br><br>
-A sample snippet json of oa2(Oauth 2.0) for httprest protocl
+A sample snippet json of oa2(Oauth 2.0) for httprest protocol
 ```javascript
 "oa2": {
         "clientid": "sb-default-abcdefghijkl....",
@@ -59,19 +68,72 @@ Please refer to [this blog post](https://blogs.sap.com/2020/09/30/sap-cloud-plat
 
 ### Azure Service Bus
 Please refer to [Azure Service Bus document](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal) about how to create and setup an Azure Service Bus namespace and a queue.
-
+<br>
+<br>
+The following authentication methods of Azure Service Bus are supported in the prototype ByDEventBridge
+* OAuth 2.0:
+<br>
+Not tested against Azure Service Bus due to internal Azure AD permission. However, OAuth 2.0 is implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L56) and tested against SAP Cloud Platform Enterprise Messaging.
+* Shared Access Signature:
+<br>
+Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.
+<br>
+<br>
+It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.
+![SendOnlySASpolicy](resources/Azure_SAS_SendOnlyPolicy.png)
 ### AWS SQS
 Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
 
-Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/ReuseLibrary/EventReuseLibrary/Function-GetAWS4SignatureKey.absl), AWS Signature V4 authentication to SQS is too complicated to implement with ABSL. Therefore, a custom rest API(namely ByDEventProxy-API) to send message to SQS with authentication as API Key through AWS API Gateway, which triggers a AWS Lambda function(namely ByDEventProxy[nodejs soure code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)) based on AWS SDK to send messages to SQS queue.
+Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/ReuseLibrary/EventReuseLibrary/Function-GetAWS4SignatureKey.absl) about Hash function and HMAC function in ABSL, [AWS Signature V4](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html#sig-v4-examples-post) authentication for SQS is too complicated to implement with ABSL. Therefore, a custom REST API(namely ByDEventProxy-API) to send message to SQS with authentication as API Key through AWS API Gateway, which triggers a AWS Lambda function(namely ByDEventProxy) based on AWS SDK to send messages to SQS queue. Please refer to [this AWS document](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-getting-started-with-rest-apis.html) about Creating a REST API with Lambda integrations in Amazon API Gateway. And an API Key should be required to access the REST API, and authorisation as none. Therefore, please create a API Key for the REST API(ByDEventProxy-API) in API Gateway.
 <br>
-Please refer to [this AWS document](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-getting-started-with-rest-apis.html) about Creating a REST API with Lambda integrations in Amazon API Gateway 
+<br>
+* Configuration of the REST API(ByDEventProxy-API) in API Gateway
+![AWS_API_Gateway_Config](resources/AWS_API_Gateway_Config.png)
+<br>
+<br>
+* [ByDEventProxy Lambda Function Source Code(NodeJS)](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)
+![AWS_ByDEventProxy_LambdaFunction_Code](resources/AWS_ByDEventProxy_LambdaFunction_Code.png)
+<br>
+<br>
+* Configuration of ByDEventProxy Lambda Function Trigger by API Gatway
+![AWS_ByDEventProxy_LambdaFunction_Trigger](resources/AWS_ByDEventProxy_LambdaFunction_Trigger.png)
+<br>
+<br>
+As a result, you now should obtain the endpoint and API Key of the REST API(ByDEventProxy-API) in API GateWay to send messages to your AWS SQS queue, which will be used in Step 3 about EventPublicationChannel setup for AWS SQS.
 
-## Step 3: Configure EventPublicationChannel representing your Cloud Messaging Service
+## Step 3: Configure an EventPublicationChannel representing your Cloud Messaging Service
+In this section, you will need to create External REST Service Integration, Communication Scenario, and Communication Arrangement for 
+* Channel Authentication (How to Authenticate the access of the Channel. Only required by Channel Authentication Method as OAuth 2.0) via outbound REST HTTP call
+* Channel Access (how to Publish the message to the channel via outbound REST HTTP call). <br>
+<br>
+It is recommended to structure the artifacts of Channel Communication as [the sample here](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication).<br>
+<br>
+The service name and communication scenario of external REST service integration about Channel Authenticaiton and Channel Access will be used in the configuration of EventPublicationChannel.
+
+### SAP Cloud Platform Enterprise Messaging
+#### Channel Authentication Configuraiton
+* Create an External Service Integration(REST) and a Communication Scenario for authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/,ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.
+<br>
+<br>
+The url of channel authentication is the tokenendpoint obtained in step 2 for SAP Cloud Platform Enterprise Messaging.<br>
+
+* Create a Communication Arrangement for the Communication Scenaion(SAPEntMsgAuthCS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br>
+<br>
+A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br>
+<br>
+Please use None Authentication for the Communication Arrangement.
+
+#### Channel Access configuraiton
+
+#### Configuration of EventPublicationChannel for SAP Cloud Platform Enterprise Messaging
+![EventPublicationChannel_SAP_Ent_Msg](resources/EventPublicationChannel_SAP_Ent_Msg.png)
+### SAP Cloud Platform Integration
+### Azure Service Bus
+### AWS SQS
 
 ## Frequently Asked Questions:
 
-### Adopting ByDEventBridge as a Customer Specific Solution or Solution Template or Multiple Customer Solution?
+### What solution type should I adopt ByDEventBridge? A Customer-Specific Solution or Solution Template or Multiple-Customer Solution?
 Answer: It is recommended to create a solution template including all reusable artifacts, such as BODL file, ABSL file and Reuse Library etc which are shared in this github, then you create customer specific solution by importing the solution template. In the long run, if you think it as a good solution which you would like to resell to multiple customers, then you can request approval to create a multi customer solution, and importing the solution template. <br>
 
 ### What are the best practice for event operation?
