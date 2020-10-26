@@ -101,10 +101,8 @@ The service name and communication scenario of external REST service integration
 #### Channel Authentication Configuraiton
 * Create an External Service Integration(REST) and a Communication Scenario for authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.<br><br>
 The url of channel authentication is the tokenendpoint obtained in step 2 for SAP Cloud Platform Enterprise Messaging.<br><br>
-* Create a Communication Arrangement for the Communication Scenaion(SAPEntMsgAuthCS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br>
-<br>
-A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br>
-<br>
+* Create a Communication Arrangement for the Communication Scenaion(SAPEntMsgAuthCS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br><br>
+A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
 Please use None Authentication for the Communication Arrangement.
 
 #### Channel Access configuraiton
