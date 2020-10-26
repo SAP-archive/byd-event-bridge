@@ -72,10 +72,8 @@ Please refer to [Azure Service Bus document](https://docs.microsoft.com/en-us/az
 <br>
 The following authentication methods of Azure Service Bus are supported in the prototype ByDEventBridge
 * OAuth 2.0:
-<br>
 Not tested against Azure Service Bus due to internal Azure AD permission. However, OAuth 2.0 is implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L56) and tested against SAP Cloud Platform Enterprise Messaging.
 * Shared Access Signature:
-<br>
 Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.
 <br>
 <br>
