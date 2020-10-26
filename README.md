@@ -71,14 +71,14 @@ Please refer to [Azure Service Bus document](https://docs.microsoft.com/en-us/az
 <br>
 <br>
 The following authentication methods of Azure Service Bus are supported in the prototype ByDEventBridge
-* OAuth 2.0:
+* OAuth 2.0:<br>
 Not tested against Azure Service Bus due to internal Azure AD permission. However, OAuth 2.0 is implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L56) and tested against SAP Cloud Platform Enterprise Messaging.
-* Shared Access Signature:
+* Shared Access Signature:<br>
 Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.
 <br>
-<br>
-It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.
+It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.<br>
 ![SendOnlySASpolicy](resources/Azure_SAS_SendOnlyPolicy.png)
+
 ### AWS SQS
 Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
 
@@ -88,12 +88,10 @@ Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/
 * Configuration of the REST API(ByDEventProxy-API) in API Gateway
 ![AWS_API_Gateway_Config](resources/AWS_API_Gateway_Config.png)
 <br>
-<br>
-* [ByDEventProxy Lambda Function Source Code(NodeJS)](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)
+* [ByDEventProxy Lambda Function Source Code(NodeJS)](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)<br>
 ![AWS_ByDEventProxy_LambdaFunction_Code](resources/AWS_ByDEventProxy_LambdaFunction_Code.png)
 <br>
-<br>
-* Configuration of ByDEventProxy Lambda Function Trigger by API Gatway
+* Configuration of ByDEventProxy Lambda Function Trigger by API Gatway<br>
 ![AWS_ByDEventProxy_LambdaFunction_Trigger](resources/AWS_ByDEventProxy_LambdaFunction_Trigger.png)
 <br>
 <br>
