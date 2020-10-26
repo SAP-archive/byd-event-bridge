@@ -77,7 +77,7 @@ Not tested against Azure Service Bus due to internal Azure AD permission. Howeve
 Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.
 <br>
 It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.<br>
-![SendOnlySASpolicy](resources/Azure_SAS_SendOnlyPolicy.png)
+![SendOnlySASpolicy](https://raw.githubusercontent.com/B1SA/ByDEventBridge/main/resources/Azure_SAS_SendOnlyPolicy.png)
 
 ### AWS SQS
 Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
@@ -108,7 +108,7 @@ The service name and communication scenario of external REST service integration
 
 ### SAP Cloud Platform Enterprise Messaging
 #### Channel Authentication Configuraiton
-* Create an External Service Integration(REST) and a Communication Scenario for authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/,ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.
+* Create an External Service Integration(REST) and a Communication Scenario for authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.
 <br>
 <br>
 The url of channel authentication is the tokenendpoint obtained in step 2 for SAP Cloud Platform Enterprise Messaging.<br>
