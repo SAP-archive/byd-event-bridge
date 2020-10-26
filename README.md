@@ -76,24 +76,18 @@ Not tested against Azure Service Bus due to internal Azure AD permission. Howeve
 * Shared Access Signature:<br>
 Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.<br>
 It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.<br>
-![Azure_SAS_SendOnlyPolicy](https://raw.githubusercontent.com/B1SA/ByDEventBridge/main/resources/Azure_SAS_SendOnlyPolicy.png)
+![Azure_SAS_SendOnlyPolicy](resources/Azure_SAS_SendOnlyPolicy.png)
 
 ### AWS SQS
 Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
 
-Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/ReuseLibrary/EventReuseLibrary/Function-GetAWS4SignatureKey.absl) about Hash function and HMAC function in ABSL, [AWS Signature V4](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html#sig-v4-examples-post) authentication for SQS is too complicated to implement with ABSL. Therefore, a custom REST API(namely ByDEventProxy-API) to send message to SQS with authentication as API Key through AWS API Gateway, which triggers a AWS Lambda function(namely ByDEventProxy) based on AWS SDK to send messages to SQS queue. Please refer to [this AWS document](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-getting-started-with-rest-apis.html) about Creating a REST API with Lambda integrations in Amazon API Gateway. And an API Key should be required to access the REST API, and authorisation as none. Therefore, please create a API Key for the REST API(ByDEventProxy-API) in API Gateway.
-<br>
-<br>
+Due to [some technical limitations](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/ReuseLibrary/EventReuseLibrary/Function-GetAWS4SignatureKey.absl) about Hash function and HMAC function in ABSL, [AWS Signature V4](https://docs.aws.amazon.com/general/latest/gr/sigv4-signed-request-examples.html#sig-v4-examples-post) authentication for SQS is too complicated to implement with ABSL. Therefore, a custom REST API(namely ByDEventProxy-API) to send message to SQS with authentication as API Key through AWS API Gateway, which triggers a AWS Lambda function(namely ByDEventProxy) based on AWS SDK to send messages to SQS queue. Please refer to [this AWS document](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-getting-started-with-rest-apis.html) about Creating a REST API with Lambda integrations in Amazon API Gateway. And an API Key should be required to access the REST API, and authorisation as none. Therefore, please create a API Key for the REST API(ByDEventProxy-API) in API Gateway.<br><br>
 * Configuration of the REST API(ByDEventProxy-API) in API Gateway
-![AWS_API_Gateway_Config](resources/AWS_API_Gateway_Config.png)
-<br>
+![AWS_API_Gateway_Config](resources/AWS_API_Gateway_Config.png)<br>
 * [ByDEventProxy Lambda Function Source Code(NodeJS)](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AWS_SQS/ByDEventProxyAPI/ProxyLambdaFunction.js)<br>
-![AWS_ByDEventProxy_LambdaFunction_Code](resources/AWS_ByDEventProxy_LambdaFunction_Code.png)
-<br>
+![AWS_ByDEventProxy_LambdaFunction_Code](resources/AWS_ByDEventProxy_LambdaFunction_Code.png)<br>
 * Configuration of ByDEventProxy Lambda Function Trigger by API Gatway<br>
-![AWS_ByDEventProxy_LambdaFunction_Trigger](resources/AWS_ByDEventProxy_LambdaFunction_Trigger.png)
-<br>
-<br>
+![AWS_ByDEventProxy_LambdaFunction_Trigger](resources/AWS_ByDEventProxy_LambdaFunction_Trigger.png)<br><br>
 As a result, you now should obtain the endpoint and API Key of the REST API(ByDEventProxy-API) in API GateWay to send messages to your AWS SQS queue, which will be used in Step 3 about EventPublicationChannel setup for AWS SQS.
 
 ## Step 3: Configure an EventPublicationChannel representing your Cloud Messaging Service
