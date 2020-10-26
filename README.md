@@ -74,10 +74,9 @@ The following authentication methods of Azure Service Bus are supported in the p
 * OAuth 2.0:<br>
 Not tested against Azure Service Bus due to internal Azure AD permission. However, OAuth 2.0 is implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L56) and tested against SAP Cloud Platform Enterprise Messaging.
 * Shared Access Signature:<br>
-Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.
-<br>
+Implemented in [source code](https://github.com/B1SA/ByDEventBridge/blob/main/src/ByDEventBridge/Event/Publication.node/Action-Publication.absl#L83), and tested against Azure Service Bus.<br>
 It is recommended to create a policy including the Send claim for the prototype ByDEventBridge, which only allows to send the message to the queue of Azure Service Bus. As a result, you have a custom send-only policy and its primary key, which will bed used in step 3 for EventPublication setup if you are using Azure Service Bus.<br>
-![SendOnlySASpolicy](https://raw.githubusercontent.com/B1SA/ByDEventBridge/main/resources/Azure_SAS_SendOnlyPolicy.png)
+![Azure_SAS_SendOnlyPolicy](https://raw.githubusercontent.com/B1SA/ByDEventBridge/main/resources/Azure_SAS_SendOnlyPolicy.png)
 
 ### AWS SQS
 Please refer to [AWS SQS document](https://aws.amazon.com/sqs/getting-started/) about how to create and setup a SQS service and a SQS queue.
