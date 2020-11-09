@@ -93,12 +93,11 @@ As a result, you now should obtain the endpoint and API Key of the REST API(ByDE
 In this section, you will need to create External REST Service Integration(through CAS), Communication Scenario(through CAS), and Communication Arrangement() for 
 * Channel Authentication (How to Authenticate the access of the Channel. Only required by Channel Authentication Method as OAuth 2.0) via outbound REST HTTP call
 * Channel Access (How to Publish the event message from ByD to the channel via outbound REST HTTP call). <br><br>
-It is recommended to structure the artifacts of Channel Communication as [the sample here](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication).<br>
-<br>
+It is recommended to structure the artifacts of Channel Communication as [the sample here](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication).<br><br>
 The service name and communication scenario of external REST service integration about Channel Authenticaiton and Channel Access will be used in the configuration of EventPublicationChannel. If you are new to Integrate an External Web Service Using REST with SAP Cloud Application Studio, please refer to [this online document](https://help.sap.com/viewer/cbcebe3cfb1647a8b0322c18dbb0b481/2020.08/en-US/7504592673e210149761cca92fcb47c4.html) for details.<br>
 <br>
-Some general tips about xternal REST service integration for EventPublicationChannel
-* A communication system will be created automatically on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
+Some general tips about external REST service integration for EventPublicationChannel
+* A communication system will be created automatically on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.
 * Please use Advanced setting for the technical configuration of Communication Arrangement, and select None Authentication. The actual authenticaitons are implemented in the source code via http headers.<br><br>
 
 ### SAP Cloud Platform Enterprise Messaging
