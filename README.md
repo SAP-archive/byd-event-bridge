@@ -18,6 +18,14 @@ Logical Components:
 The prototype ByDEventBridge is a customer-specific solution built with SAP Cloud Application on our internal tenant, therefore it is not possible to download the package, then directly import and deploy to another tenant. And the published source code only includes BODL and ABSL files, the wizard-based artifacts are exclusive due to the fact of their strict dependence with tooling and tenant, such as UI Screen, Query, Mass Data Run, External Service Integration, Communication Scenario and Communication Arrangement etc... which require to be created or configured with your own SAP Cloud Application on your own target ByD tenant. <br>
 
 It is recommended to create a solution template including all reusable artifacts, such as BODL file, ABSL file and Reuse Library etc which are shared in this github, then you create customer specific solution by importing the solution template.
+### [CodeList](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/CodeList)
+Please create the CodeList below per screenshots.
+* AuthenticationMode
+* ChannelStatus
+* EventPublicationChannelType
+* EventPublicationStatus
+* EventPublisher
+* EventType
 
 ### [Event](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/Event)
 #### BusinessObjectEvent
