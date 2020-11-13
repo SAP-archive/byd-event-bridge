@@ -84,6 +84,8 @@ A sample snippet json of oa2(Oauth 2.0) for httprest protocol
 ### SAP Cloud Platform Integration
 Please refer to [this blog post](https://blogs.sap.com/2020/09/30/sap-cloud-platform-integration-for-sap-business-bydesign-webinar/) about how to setup an instance and create an integration flow with https adapter.
 
+Here you a [sample](https://blogs.sap.com/2020/11/13/sap-cloud-platform-integration-for-smbs-samples/) for ByD Event
+
 ### Azure Service Bus
 Please refer to [Azure Service Bus document](https://docs.microsoft.com/en-us/azure/service-bus-messaging/service-bus-quickstart-portal) about how to create and setup an Azure Service Bus namespace and a queue.
 <br><br>
