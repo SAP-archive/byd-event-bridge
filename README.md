@@ -1,5 +1,6 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/byd-event-bridge)](https://api.reuse.software/info/github.com/SAP-samples/byd-event-bridge)
-# Overview
+[![License: Apache2](https://img.shields.io/badge/License-Apache2-green.svg)](https://opensource.org/licenses/Apache-2.0)
+# Description
 A prototype built with SAP Cloud App Studio enables an event pub/sub mechanism for SAP Business ByDesign by plugging into modern cloud messaging services for side-by-side solution/extension development via an event-driven and loosely-coupled approach. <br>
 <br>
 Please refer to [this blog post](https://blogs.sap.com/?p=1204783) about an overview introduction to the ByDEventBridge prototype.
@@ -15,7 +16,7 @@ Logical Components:
 ![Architecture](resources/ByDEventBridge_Class_Diagram.png)
 
 # How-to guide
-## Requirement
+## Requirements
 * SAP Business ByDesign tenant
 * SAP Cloud Application Studio
 * An instance of Cloud Messaging Service, such as
