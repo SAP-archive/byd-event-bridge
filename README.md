@@ -1,3 +1,4 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/byd-event-bridge)](https://api.reuse.software/info/github.com/SAP-samples/byd-event-bridge)
 # Overview
 A prototype built with SAP Cloud App Studio enables an event pub/sub mechanism for SAP Business ByDesign by plugging into modern cloud messaging services for side-by-side solution/extension development via an event-driven and loosely-coupled approach. <br>
 <br>
