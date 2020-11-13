@@ -49,8 +49,8 @@ Please create the CodeList below per screenshots.
 #### [ObjectEventConfig](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ObjectEventConfig)
 ![ObjectEventConfig](resources/ObjectEventConfig.png)
 
-### [Event Source](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/EventSource)
-In this sample, [CustomerInvoice](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/EventSource/CustomerInvoice) and Account are included as event sources through Event-BeforeSafe() of Business Object Extension.<br>
+### [Event Source](src/ByDEventBridge/EventSource)
+In this sample, [CustomerInvoice](src/ByDEventBridge/EventSource/Sales/CustomerInvoice) and Account are included as event sources through Event-BeforeSafe() of Business Object Extension.<br>
 
 You can generate the business object event to  a standard business object or custom business object by adding the following code in the Event-BeforeSafe on the targe node of the source business object.
 
