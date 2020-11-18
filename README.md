@@ -122,15 +122,15 @@ Some general tips about external REST service integration for EventPublicationCh
 
 ### SAP Cloud Platform Enterprise Messaging
 #### Channel Authentication Configuraiton
-* Create an External Service Integration(REST) and a Communication Scenario for then chanel authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.<br><br>
-The url of channel authentication is the tokenendpoint obtained in step 2 for SAP Cloud Platform Enterprise Messaging.<br><br>
+* Create an External Service Integration(REST) and a Communication Scenario for then chanel authentication with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAuth](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAuth_CS.<br><br>
+The url of channel authentication is the tokenendpoint obtained in [step 2](#Step-2:-Setup-your-own-Cloud-Messaging-Service) for SAP Cloud Platform Enterprise Messaging.<br><br>
 * Create a Communication Arrangement for the Communication Scenaion(SAPEntMsgAuthCS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br><br>
 A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
 Please use None Authentication for the Communication Arrangement.
 
 #### Channel Access Configuraiton
-* Create an External Service Integration using REST and a Communication Scenario for then channel access with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAccess.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAccess_CS.csd<br><br>
-The url of channel access is the uri obtained in step 2 for SAP Cloud Platform Enterprise Messaging.<br><br>
+* Create an External Service Integration using REST and a Communication Scenario for then channel access with SAP Cloud Application Studio, for example the service name as [SAPEntMsgAccess](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPEntMsg) and the communication scenario as SAPEntMsgAccess_CS<br><br>
+The url of channel access is the uri obtained in [step 2](#Step-2:-Setup-your-own-Cloud-Messaging-Service) for SAP Cloud Platform Enterprise Messaging.<br><br>
 * Create a Communication Arrangement for the Communication Scenaion(SAPEntMsgAuthCS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br><br>
 A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPENTMSGAUTHCS-YCNOWIADY is created for communication scenario SAPEntMsgAuth_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
 Please use None Authentication for the Communication Arrangement.
@@ -149,7 +149,7 @@ In the connection of the integration flow, you can setup the authentication as U
 #### Channel Authentication Configuraiton in EventPublicationChannel
 No separated authentication required.
 #### Channel Access Configuraiton in EventPublicationChannel
-* Create an External Service Integration using REST and a Communication Scenario for then channel access with SAP Cloud Application Studio, for example the service name as [SAPCPI_ByDEvents.wsid](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPCPI) and the communication scenario as SAPCPI_ByDEvents_CS.csd<br><br>
+* Create an External Service Integration using REST and a Communication Scenario for then channel access with SAP Cloud Application Studio, for example the service name as [SAPCPI_ByDEvents](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/SAPCPI) and the communication scenario as SAPCPI_ByDEvents_CS<br><br>
 The url of channel access is the url enpoint configured in the integration flow of SAP Cloud Platform Integration.<br><br>
 * Create a Communication Arrangement for the Communication Scenaion(SAPCPI_ByDEvents_CS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br><br>
 A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named SAPCPI_ByDEvents_CS-YCNOWIADY is created for communication scenario SAPCPI_ByDEvents_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
@@ -159,6 +159,21 @@ Please use None Authentication for the Communication Arrangement.
 ![EventPublicationChannel_SCP_CPI](resources/EventPublicationChannel_SCP_CPI.png)
 
 ### Azure Service Bus
+#### Channel Authentication Configuraiton
+##### For OAuth 2.0
+* Create an External Service Integration using REST and comminucation scenario with SAP Cloud Application Studio. The url of channel authentication is the OAuth url for the queue within Azure Service Bus.
+* Create a Communication Arrangement for the Communication Scenaion. Please use None Authentication for the Communication Arrangement.
+##### For Shared Access Signature
+No channel authenticaion configuration required. 
+
+#### Channel Access Configuraiton
+* Create an External Service Integration using REST and a Communication Scenario for then channel access with SAP Cloud Application Studio, for example the service name as [AzureServiceBus](https://github.com/B1SA/ByDEventBridge/tree/main/src/ByDEventBridge/EventConfig/ChannelCommunication/AzureServiceBus) and the communication scenario as AzureServiceBus_CS<br><br>
+The url of channel access is the uri obtained in [step 2](#Step-2:-Setup-your-own-Cloud-Messaging-Service) for Azure Service Bus.<br><br>
+* Create a Communication Arrangement for the Communication Scenaion(AzuerServiceBus_CS) by right clicking the communicaiton scenrio, and select "Manage Communication Arrangement".<br><br>
+A communication system is automatically created on the creation of the communication scenario, therefore, it is unnecessary to create a communication system for the service by manual. For example, a communication system named AZURESERVICEBUS-YCNOWIADY is created for communication scenario AzuerServiceBus_CS, YCNOWIADY as the prefix of my ByDEventBridge solution in Cloud Application Studio.<br><br>
+Please use None Authentication for the Communication Arrangement.
+#### Configuration of EventPublicationChannel for Azure Service Bus
+![EventPublicationChannel_AzureServiceBus](resources/EventPublicationChannel_AzureServiceBus.png)
 
 ### AWS SQS
 
@@ -178,11 +193,11 @@ Answer: As rules of thumb<br>
 Answer: Although, the sample prototype is cloud-messaging-service-agnostic, supporting SAP Enterprise Messaging, SAP Cloud Platform Integration, Azure Service Bus and AWS SQS. In reality, most likely one type of cloud message service is enough.It is up to your company's strategy and client's preference to pick. If the client opt-in one vendor strategy, then SAP Enterprise Messaging or SAP Cloud Platform Integration is the right choice since they have already been a SAP customer for SAP Business ByDesign. for details, you may refer to the blog posts SCP Enterprise Messaging for the SMBs by my colleague Thiago Mendes, and SAP Cloud Platform Integration for SAP Business ByDesign webinar  by Maria Trinidad MARTINEZ GEA .
 
 ### Can I send the event directly to my external app without a cloud-based message service?
-Answer: Yes. The ByDEventBridge itself implements the event pub/sub mechanism. The event can be published to ANY http service with the following authentication by defining a publication channel with the target http access endpoint.
+Answer: Yes. The ByDEventBridge itself implements the event pub/sub mechanism. The event message can be published to ANY http service with the following authentication by defining a publication channel with the target http access endpoint.
 * No Authentication
 * Basic Authentication
-* SAML 2.0
-Therefore, the event could be sent to external partner app directly, which can handle an http request without a cloud-based message service.
+* OAuth 2.0
+Therefore, you can have the event message published to an external partner app directly for processing, which can handle an http request without a cloud-based message service.
 
 ### When do you need event? What granularity of messaging queue or topic and partner solution as event subscriber?
 Answer: The granularity of messaging queue or topic could be per partner solution/object type/source tenant or any combination, giving the flexibility of partner solution development and operation for addressing the variety of business and security etc requirements. For instance:<br>
